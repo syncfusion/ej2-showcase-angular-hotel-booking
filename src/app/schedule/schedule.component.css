@@ -1,0 +1,104 @@
+@import "@syncfusion/ej2-base/styles/tailwind.css";
+@import "@syncfusion/ej2-buttons/styles/tailwind.css";
+@import "@syncfusion/ej2-calendars/styles/tailwind.css";
+@import "@syncfusion/ej2-dropdowns/styles/tailwind.css";
+@import "@syncfusion/ej2-inputs/styles/tailwind.css";
+@import "@syncfusion/ej2-lists/styles/tailwind.css";
+@import "@syncfusion/ej2-navigations/styles/tailwind.css";
+@import "@syncfusion/ej2-popups/styles/tailwind.css";
+@import "@syncfusion/ej2-splitbuttons/styles/tailwind.css";
+@import "@syncfusion/ej2-schedule/styles/tailwind.css";
+@import "@syncfusion/ej2-icons/styles/tailwind.css";
+@import '@syncfusion/ej2-notifications/styles/tailwind.css';
+
+.app-scheduler.e-schedule .e-table-wrap .e-resource-column-wrap .e-resource-column-table .e-resource-cells.e-parent-node {
+  border-right-color: transparent !important;
+  height: 40px !important;
+}
+
+.app-scheduler.e-schedule .e-table-wrap .e-resource-column-wrap .e-resource-column-table .e-resource-cells.e-parent-node .e-resource-text {
+  color: #3b82f6 !important;
+}
+
+.app-scheduler.e-schedule .e-work-cells.e-resource-group-cells {
+  border-left-color: transparent !important;
+  height: 40px !important;
+}
+
+.app-scheduler.e-schedule .e-timeline-month-view .e-resource-left-td {
+  border-right-color: transparent !important;
+}
+
+.app-scheduler.e-schedule .e-timeline-month-view .e-header-cells.e-date-header {
+  border-left-color: transparent !important;
+}
+
+.app-scheduler.e-schedule .template-wrap {
+  display: flex !important;
+  flex-direction: column !important;
+  gap: 4px !important;
+  justify-content: center !important;
+}
+
+.app-scheduler.e-schedule .template-wrap .price-tag {
+  color: #c5c5c5 !important;
+  text-align: center !important;
+  font-family: inherit !important;
+  font-size: 12px !important;
+  font-style: normal !important;
+  font-weight: 400 !important;
+  line-height: 18px !important;
+}
+
+.e-schedule-dialog-container .e-dlg-content {
+  background-color: #fff !important;
+  border-bottom: 1px solid #d1d5db !important;
+  border-top: 1px solid #d1d5db !important;
+}
+
+.e-schedule-dialog-container .e-dlg-content .custom-event-editor {
+  display: flex !important;
+  flex-wrap: wrap !important;
+  row-gap: 18px !important;
+  column-gap: 5px !important;
+  justify-content: space-between !important;
+  width: 100% !important;
+  height: 560px;
+}
+
+.e-schedule-dialog-container .e-dlg-content .custom-event-editor .flex-prop {
+  flex: 0 48% !important;
+}
+
+.e-schedule-dialog-container .e-dlg-content .custom-event-editor.e-device .flex-prop {
+  flex: 0 100% !important;
+}
+
+.e-schedule .e-timeline-month-view .e-content-wrap table tr:last-child td {
+  border-bottom-width: 1px !important;
+}
+
+.past-cell {
+  background: #eff1f3 !important;
+}
+
+@media screen and (width <=540px) {
+  .app-scheduler.e-schedule .e-table-container .e-schedule-table .e-resource-left-td {
+    width: 140px !important;
+  }
+
+  .app-scheduler.e-schedule .e-table-container .e-schedule-table .e-resource-text {
+    font-size: 16px !important;
+    padding: 4px 0 !important;
+  }
+
+  .custom-event-editor {
+    grid-template-columns: 1fr !important;
+  }
+}
+
+@media screen and (width <=640px) {
+  .custom-event-editor {
+    grid-template-columns: 1fr !important;
+  }
+}

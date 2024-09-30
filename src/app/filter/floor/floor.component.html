@@ -1,0 +1,20 @@
+<div class="checkbox-filter-container">
+    <div class="floor-filter">
+      <div class="filter-checkbox">
+        <ejs-checkbox
+          label="Select All"
+          [checked]="checkboxAllState"
+          (change)="onCheckboxChangeAll($event)"
+        ></ejs-checkbox>
+      </div>
+    </div>
+    <div *ngFor="let item of floorData; let index = index" class="floor-filter">
+      <div class="filter-checkbox">
+        <ejs-checkbox
+           [label]="item?.['text']"
+          [checked]="checkboxStates[index]"
+          (change)="onCheckboxChange($event, item)"
+        ></ejs-checkbox>
+      </div>
+    </div>
+  </div>

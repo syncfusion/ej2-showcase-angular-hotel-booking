@@ -1,0 +1,19 @@
+@import "@syncfusion/ej2-base/styles/tailwind.css";
+@import "@syncfusion/ej2-navigations/styles/tailwind.css";
+
+.price-filter-container {
+  margin: 0 auto;
+  width: 90%;
+}
+
+.slider-price {
+  align-items: center;
+  display: flex;
+  justify-content: space-between;
+}
+
+.slider-label-start,
+.slider-label-end {
+  font-size: 14px;
+  font-weight: bold;
+}
