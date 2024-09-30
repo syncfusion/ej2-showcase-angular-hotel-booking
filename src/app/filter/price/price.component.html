@@ -1,0 +1,17 @@
+<div class="price-filter-container">
+  <div class="slider-price">
+    <span class="slider-label-start" [ngStyle]="{'position': 'relative', 'left.px': leftHandlePosition, 'transition': 'transform 0.4s cubic-bezier(0.25, 0.8, 0.25, 1)'}">${{leftHandleValue}}</span>
+    <span class="slider-label-end" [ngStyle]="{'position': 'absolute', 'left.px': rightHandlePosition, 'transition': 'transform 0.4s cubic-bezier(0.25, 0.8, 0.25, 1)'}">${{rightHandleValue}}</span>
+  </div>
+  <ejs-slider
+    #sliderObj
+    cssClass="app-slider"
+    [value]="priceRange"
+    type="Range"
+    [tooltip]="tooltip"
+    [min]="0"
+    [max]="500"
+    (change)="onSliderChanged($event)"
+    (created)="onSliderCreated()"
+  ></ejs-slider>
+</div>

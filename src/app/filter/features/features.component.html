@@ -1,0 +1,9 @@
+<div class="checkbox-filter-container">
+    <div *ngFor="let item of roomData; let index = index" class="filter-checkbox">
+      <ejs-checkbox
+        [label]="item?.['name']"
+        [checked]="checkboxStates[index]"
+        (change)="onCheckboxChange($event, item)"
+      ></ejs-checkbox>
+    </div>
+</div>

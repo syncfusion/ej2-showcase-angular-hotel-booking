@@ -1,0 +1,29 @@
+<div class="header-container" style="display: flex;">
+  <div *ngIf="!browser" class="search-container">
+    <ejs-textbox cssClass="app-search" placeholder="Search Room" [width]="200" (change)="onSearchChange($event)"
+      [showClearButton]="true">
+    </ejs-textbox>
+  </div>
+
+  <div class="navigation-container">
+    <div class="e-btn-group e-outline">
+      <button ejs-button iconCss="e-icons e-chevron-left" (click)="onMonthChange('prev')">
+      </button>
+
+      <button ejs-button [content]="dateFormat" readOnly="true">
+      </button>
+
+      <button ejs-button iconCss="e-icons e-chevron-right" (click)="onMonthChange('next')">
+      </button>
+    </div>
+  </div>
+  <div class="button-container">
+    <button ejs-button class="filter-button" (click)="onMonthChange('prev')">
+      <img src='./assets/images/filter.svg'>
+    </button>
+    <button ejs-button class="new-button" (click)="handleOpenEditor()">
+      <img src='./assets/images/plus.svg'>
+      <div [ngClass]="{ 'e-device': browser }">New Booking</div>
+    </button>
+  </div>
+</div>

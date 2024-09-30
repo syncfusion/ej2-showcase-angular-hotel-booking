@@ -1,0 +1,42 @@
+<!-- To Render AppBar. -->
+
+<div class="app-main-container">
+  <ejs-appbar class="app-header">
+    <img class="app-header-logo" src="./assets/images/logo.svg" alt="logo" />
+    <div class="e-appbar-spacer"></div>
+    <div class="avatar-container">
+      <img class="avatar-image" src="./assets/images/user.svg" alt="avatar" />
+      <span class="avatar-name">Hi, John David</span>
+    </div>
+
+  </ejs-appbar>
+
+  <main class="main-container">
+
+    <div class="sidebar-container">
+      <app-sidebar> </app-sidebar>
+    </div>
+    <div class="content-container">
+      <div >
+        <app-header></app-header>
+      </div>
+      <div class="schedule-container">
+        <ng-container *ngIf="commonService?.showSchedule; else noSchedule">
+        <app-schedule></app-schedule>
+        </ng-container>
+        <ng-template #noSchedule>
+          <div class="no-schedule">
+            <strong style="font-size: 16px;">
+              No properties found
+            </strong>
+            <p style="font-size: 14px;">
+              There are no matching properties for your search criteria. Try
+              updating your search.
+            </p>
+          </div>
+        </ng-template>
+      </div>
+    </div>
+  </main>
+
+</div>

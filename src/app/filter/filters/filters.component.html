@@ -1,0 +1,19 @@
+<ejs-accordion class="app-filters">
+    <e-accordionitems>
+      <e-accordionitem header='Floors' [expanded]="true">
+        <ng-template #content>
+          <app-floor></app-floor>
+        </ng-template>
+      </e-accordionitem>
+      <e-accordionitem header='Price'>
+        <ng-template #content>
+          <app-price></app-price>
+        </ng-template>
+      </e-accordionitem>
+      <e-accordionitem header='Features'>
+        <ng-template #content>
+          <app-features></app-features>
+        </ng-template>
+      </e-accordionitem>
+    </e-accordionitems>
+  </ejs-accordion>
