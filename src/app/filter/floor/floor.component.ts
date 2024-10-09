@@ -1,21 +1,21 @@
 import { CommonModule } from '@angular/common';
-import { ChangeDetectorRef, Component } from '@angular/core';
+import { Component } from '@angular/core';
 import { CheckBoxModule } from '@syncfusion/ej2-angular-buttons'
-import { enableRipple } from '@syncfusion/ej2-base'
 import { CommonService } from '../../common.service';
-import { features } from 'process';
+import { AvailabilityComponent } from '../availability/availability.component';
+
 @Component({
   selector: 'app-floor',
   standalone: true,
-  imports: [CheckBoxModule, CommonModule],
+  imports: [CheckBoxModule, CommonModule, AvailabilityComponent],
   templateUrl: './floor.component.html',
-  styleUrl: './floor.component.css'
+  styleUrl: './floor.component.css',
 })
 export class FloorComponent {
   checkboxAllState: boolean = false;
-  selectedData: any = [] ;
+  selectedData: any = [];
 
-  constructor(private commonService: CommonService,private cdr: ChangeDetectorRef) {}
+  constructor(private commonService: CommonService) { }
 
   floorData!: Array<Record<string, any>>;
   checkboxStates: boolean[] = [];
@@ -23,13 +23,15 @@ export class FloorComponent {
   ngOnInit(): void {
     this.floorData = this.commonService.floorData;
     this.checkboxStates[0] = true;
+    this.checkboxStates[1] = true;
     this.selectedData.push(this.floorData[0]['id']);
-    this.detectionRef();
+    this.selectedData.push(this.floorData[1]['id']);
   }
 
+
   onCheckboxChangeAll(event: any): void {
-    console.log(event);
-    if(event.checked === true) {
+
+    if (event.checked === true) {
       this.checkboxStates = this.floorData.map(() => true);
       this.selectedData = this.floorData.map((item: any) => item.id);
     } else {
@@ -37,19 +39,23 @@ export class FloorComponent {
       this.selectedData = [];
     }
     this.detectionRef();
-  
+
     // Your logic for handling "Select All" checkbox change
   }
 
   onCheckboxChange(event: any, item: any): void {
-    console.log(event);
-    if(event.checked) {
+    if (event.checked) {
       this.selectedData.push(item?.id);
-    } else { 
+    } else {
       const index = this.selectedData.findIndex((id: any) => id === item?.id);
-      if(index >= 0) {
+      if (index >= 0) {
         this.selectedData.splice(index, 1);
       }
+    }
+    if (this.selectedData.length === this.floorData.length) {
+      this.checkboxAllState = true;
+    } else {
+      this.checkboxAllState = false;
     }
     this.detectionRef();
 
@@ -63,6 +69,5 @@ export class FloorComponent {
       floorId: this.selectedData
     };
     this.commonService.filterData.next(newValue);
-    this.cdr.detectChanges();
   }
 }

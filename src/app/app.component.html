@@ -17,14 +17,14 @@
       <app-sidebar> </app-sidebar>
     </div>
     <div class="content-container">
-      <div >
+      <div>
         <app-header></app-header>
       </div>
       <div class="schedule-container">
-        <ng-container *ngIf="commonService?.showSchedule; else noSchedule">
+        <!-- <ng-container *ngIf="commonService?.showSchedule; else noSchedule"> -->
         <app-schedule></app-schedule>
-        </ng-container>
-        <ng-template #noSchedule>
+        <!-- </ng-container> -->
+        <!-- <ng-template #noSchedule>
           <div class="no-schedule">
             <strong style="font-size: 16px;">
               No properties found
@@ -34,7 +34,7 @@
               updating your search.
             </p>
           </div>
-        </ng-template>
+        </ng-template> -->
       </div>
     </div>
   </main>

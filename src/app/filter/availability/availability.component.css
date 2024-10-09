@@ -1,0 +1,30 @@
+@import '@syncfusion/ej2-base/styles/tailwind.css';
+@import '@syncfusion/ej2-buttons/styles/tailwind.css';
+@import '@syncfusion/ej2-popups/styles/tailwind.css';
+@import '@syncfusion/ej2-navigations/styles/tailwind.css';
+@import "@syncfusion/ej2-inputs/styles/tailwind.css";
+
+
+.room-availability {
+    align-items: center;
+    border-radius: 48px;
+    display: inline-flex;
+    font-size: 12px;
+    font-style: normal;
+    font-weight: 500;
+    gap: 10px;
+    justify-content: center;
+    line-height: 18px;
+    padding: 0 8px;
+    text-transform: capitalize;
+}
+
+.room-availability.avail {
+    background: #ecfdf5;
+    color: #10b981;
+}
+
+.room-availability.full {
+    background: #fef2f2;
+    color: #dc2626;
+}

@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { ChangeDetectorRef, Component } from '@angular/core';
+import { ChangeDetectionStrategy, ChangeDetectorRef, Component } from '@angular/core';
 import { CheckBoxModule } from '@syncfusion/ej2-angular-buttons';
 import { CommonService } from '../../common.service';
 
@@ -8,28 +8,32 @@ import { CommonService } from '../../common.service';
   standalone: true,
   imports: [CheckBoxModule, CommonModule],
   templateUrl: './features.component.html',
-  styleUrl: './features.component.css'
+  styleUrl: './features.component.css',
+  changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class FeaturesComponent {
   roomData: any = [];
   selectedData: any = [];
-  constructor(private commonService: CommonService,private cdr: ChangeDetectorRef) {}
-  
+  constructor(private commonService: CommonService, private cdr: ChangeDetectorRef) { }
+
   checkboxStates = [false, false, false];
   ngOnInit(): void {
     this.roomData = this.commonService.amenities;
+    this.checkboxStates[0] = true;
+    this.selectedData.push(this.roomData[0]['id']);
+    this.detectionRef();
   }
   onCheckboxChange(event: any, item: any): void {
-   // this.checkboxStates[index] = event.checked;
-   if(event.checked) {
-    this.selectedData.push(item?.id);
-  } else { 
-    const index = this.selectedData.findIndex((id: any) => id === item?.id);
-    if(index >= 0) {
-      this.selectedData.splice(index, 1);
+    // this.checkboxStates[index] = event.checked;
+    if (event.checked) {
+      this.selectedData.push(item?.id);
+    } else {
+      const index = this.selectedData.findIndex((id: any) => id === item?.id);
+      if (index >= 0) {
+        this.selectedData.splice(index, 1);
+      }
     }
-  }
-  this.detectionRef();
+    this.detectionRef();
   }
 
   detectionRef() {
