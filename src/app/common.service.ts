@@ -306,16 +306,8 @@ export class CommonService {
   showSchedule: boolean = true;
   currentDate = new BehaviorSubject<Date>(new Date());
   emittedSavedData = new BehaviorSubject<boolean>(true);
-  public sharedValue: any = 'initial value';
+  openSideBar = new BehaviorSubject<boolean>(null);
 
-  // Method to update the shared variable
-  setSharedValue(newValue: any) {
-    this.sharedValue = newValue;
-  }
 
-  // Method to retrieve the shared variable
-  getSharedValue() {
-    return this.sharedValue;
-  }
   constructor() { }
 }

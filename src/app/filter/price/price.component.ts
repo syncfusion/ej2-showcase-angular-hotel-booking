@@ -20,7 +20,6 @@ export class PriceComponent {
   min: number = 0;
   max: number = 500;
   type: string = "Range";
-  // limits: object = { enabled: true, minStart: 0, minEnd: 100, maxStart: 150, maxEnd: 500 };
   selectedData: any = [];
 
   constructor(private commonService: CommonService, private cdRef: ChangeDetectorRef) { }

@@ -5,6 +5,7 @@ import { TextBoxModule } from '@syncfusion/ej2-angular-inputs';
 import { Browser, Internationalization } from '@syncfusion/ej2-base'; // Make sure to import the necessary service
 import { SchedulerComponent } from '../schedule/schedule.component';
 import { CommonService } from '../common.service';
+import { SidebarComponent } from '@syncfusion/ej2-angular-navigations';
 
 @Component({
   selector: 'app-header',
@@ -16,6 +17,7 @@ import { CommonService } from '../common.service';
 })
 export class HeaderComponent implements OnInit {
   @ViewChild('scheduleObj') scheduleObj!: SchedulerComponent;
+
   browser = Browser.isDevice;
   intl: Internationalization = new Internationalization();
   currentDate!: Date
@@ -80,5 +82,9 @@ export class HeaderComponent implements OnInit {
     if (!this.scheduleObj) {
 
     }
+  }
+
+  onFilterOpen() {
+    this.commonService.openSideBar.next(true);
   }
 }

@@ -1,15 +1,13 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ViewChild } from '@angular/core';
 import { ScheduleModule, RecurrenceEditorModule } from '@syncfusion/ej2-angular-schedule';
 import { CommonModule } from '@angular/common';
 import { RouterOutlet } from '@angular/router';
-import { AppBarModule } from '@syncfusion/ej2-angular-navigations';
+import { AppBarModule, SidebarComponent } from '@syncfusion/ej2-angular-navigations';
 import { SidebarControl } from './sidebar/sidebar.component';
 import { HeaderComponent } from './header/header.component';
 import { SchedulerComponent } from './schedule/schedule.component';
 import { CommonService } from './common.service';
 
-// import User from '../assets/images/user.svg';
-// import Logo from '../assets/images/logo.svg';
 @Component({
   selector: 'app-root',
   standalone: true,
@@ -21,9 +19,12 @@ export class AppComponent {
   title = 'my-app';
   startDate: Date = new Date()
   id: number = 1;
+  @ViewChild('sideBar') sideBar!: SidebarComponent;
+
   constructor(public commonService: CommonService) { }
 
   ngOnInit() {
+
     for (let i: number = 0, f: number = 5; i < 20; i++, f++) {
       const randomCollection: number[] = [];
       let random: number = 0;

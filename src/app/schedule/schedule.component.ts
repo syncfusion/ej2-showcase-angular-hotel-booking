@@ -1,6 +1,6 @@
-import { Component, ElementRef, HostListener, Inject, PLATFORM_ID, Renderer2, ViewChild, ViewEncapsulation, OnInit, ChangeDetectionStrategy, ChangeDetectorRef } from '@angular/core';
+import { Component, ElementRef, HostListener, Inject, PLATFORM_ID, Renderer2, ViewChild, ViewEncapsulation, ChangeDetectionStrategy, ChangeDetectorRef } from '@angular/core';
 
-import { ActionEventArgs, addDays, EJ2Instance, EventFieldsMapping, EventRenderedArgs, PopupCloseEventArgs, PopupOpenEventArgs, RenderCellEventArgs, resetTime, ResourceDetails, ScheduleComponent, ScheduleModule, setTime } from '@syncfusion/ej2-angular-schedule'
+import { ActionEventArgs, addDays, EJ2Instance, PopupCloseEventArgs, resetTime, ScheduleComponent, ScheduleModule, } from '@syncfusion/ej2-angular-schedule'
 import { RadioButtonModule } from '@syncfusion/ej2-angular-buttons'
 import { Query } from '@syncfusion/ej2-data';
 import {
@@ -143,8 +143,6 @@ export class SchedulerComponent {
           );
         }
       } else if (res && res.floorId.length === 0) {
-        // this.floorData = this.commonService.floorData;
-        // this.roomData = this.commonService.roomData;
         this.commonService.showSchedule = false;
       }
       if (this.roomData.length === 0) {
@@ -424,7 +422,12 @@ export class SchedulerComponent {
     }
   }
 
-  onPopupClose(args: any) {
+  onPopupClose(args: PopupCloseEventArgs) {
+    if (args?.event?.target["innerText"] === "" && args?.data && this.bookingForm.invalid) {
+      this.bookingForm.markAllAsTouched();
+      args.cancel = true;
+      args.data = null;
+    }
     if (args?.event?.target["innerText"] === "" || args?.event?.target["innerText"] === 'Cancel') {
       args.cancel = false;
     }
@@ -432,6 +435,7 @@ export class SchedulerComponent {
       this.bookingForm.markAllAsTouched();
       args.cancel = true;
     }
+
     if (args.type === 'Editor' && args.data) {
       const formElement: any = args.element.querySelectorAll(
         '.custom-event-editor .e-lib[data-name]',

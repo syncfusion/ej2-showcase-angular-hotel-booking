@@ -1,6 +1,6 @@
 import { CommonModule } from '@angular/common';
-import { Component } from '@angular/core';
-import { CheckBoxModule } from '@syncfusion/ej2-angular-buttons'
+import { Component, ViewChild } from '@angular/core';
+import { CheckBoxComponent, CheckBoxModule } from '@syncfusion/ej2-angular-buttons'
 import { CommonService } from '../../common.service';
 import { AvailabilityComponent } from '../availability/availability.component';
 
@@ -14,7 +14,6 @@ import { AvailabilityComponent } from '../availability/availability.component';
 export class FloorComponent {
   checkboxAllState: boolean = false;
   selectedData: any = [];
-
   constructor(private commonService: CommonService) { }
 
   floorData!: Array<Record<string, any>>;
@@ -34,29 +33,35 @@ export class FloorComponent {
     if (event.checked === true) {
       this.checkboxStates = this.floorData.map(() => true);
       this.selectedData = this.floorData.map((item: any) => item.id);
+      this.checkboxAllState = true;
     } else {
       this.checkboxStates = this.floorData.map(() => false);
       this.selectedData = [];
+      this.checkboxAllState = false;
     }
+    console.log(this.checkboxStates);
     this.detectionRef();
 
     // Your logic for handling "Select All" checkbox change
   }
 
-  onCheckboxChange(event: any, item: any): void {
+  onCheckboxChange(event: any, item: any, index: number): void {
     if (event.checked) {
       this.selectedData.push(item?.id);
+      this.checkboxStates[index] = true;
     } else {
-      const index = this.selectedData.findIndex((id: any) => id === item?.id);
-      if (index >= 0) {
-        this.selectedData.splice(index, 1);
+      const selectedIndex = this.selectedData.findIndex((id: any) => id === item?.id);
+      if (selectedIndex >= 0) {
+        this.selectedData.splice(selectedIndex, 1);
       }
+      this.checkboxStates[index] = false;
     }
     if (this.selectedData.length === this.floorData.length) {
       this.checkboxAllState = true;
     } else {
       this.checkboxAllState = false;
     }
+    console.log(this.checkboxAllState);
     this.detectionRef();
 
     // Your logic for handling individual checkbox change
