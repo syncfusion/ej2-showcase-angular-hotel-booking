@@ -1,6 +1,8 @@
 import { CommonModule } from '@angular/common';
-import { Component, ViewChild } from '@angular/core';
-import { SliderModule, SliderComponent } from '@syncfusion/ej2-angular-inputs'
+import { ChangeDetectorRef, Component, Output, ViewChild } from '@angular/core';
+import { SliderModule, SliderComponent } from '@syncfusion/ej2-angular-inputs';
+import { CommonService } from '../../common.service';
+
 @Component({
   selector: 'app-price',
   standalone: true,
@@ -9,32 +11,77 @@ import { SliderModule, SliderComponent } from '@syncfusion/ej2-angular-inputs'
   styleUrl: './price.component.css'
 })
 export class PriceComponent {
-  // public rangeType: string = "Range";
-  // public rangeValue: number[] = [30, 70];
   @ViewChild('sliderObj', { static: false }) sliderObj!: SliderComponent;
-  leftHandlePosition: number = 0;
-  rightHandlePosition: number = 0;
-  leftHandleValue: number = 0;
-  rightHandleValue: number = 500;
-  priceRange: number[] = [0, 500];
-  tooltip: Object = { isVisible: false, placement: 'Before', showOn: 'Focus' };
+
+  leftHandleValue: number = 200;
+  rightHandleValue: number = 300;
+  tooltip: Object = { isVisible: true, placement: 'Before', showOn: 'Focus' };
+  value: number[] = [200, 300];
+  min: number = 0;
+  max: number = 500;
+  type: string = "Range";
+  selectedData: any = [];
+
+  constructor(private commonService: CommonService, private cdRef: ChangeDetectorRef) { }
+
+  ngOnInit(): void {
+    this.updateTooltipValues();
+    if (this.sliderObj)
+      this.sliderObj.value = [200, 350]
+  }
+
+  ngAfterViewInit() {
+    // Detach change detection before making any changes
+    this.cdRef.detach();
+
+    this.updateTooltipValues();
+    if (this.sliderObj)
+      this.sliderObj.value = [200, 350]
+    // Reattach change detection to refresh the view
+    this.cdRef.reattach();
+    this.cdRef.detectChanges(); // Manually trigger change detection
+    // }, 0);
+  }
 
   onSliderChanged(event: any): void {
-    // Your logic for handling slider change
-    this.leftHandleValue = event.value[0];
-    this.rightHandleValue = event.value[1];
-    this.leftHandlePosition = this.calculatePosition(this.leftHandleValue);
-    this.rightHandlePosition = this.calculatePosition(this.rightHandleValue);
+    if (event?.isInteracted) {
+      this.selectedData = [];
+      this.leftHandleValue = event.value[0];
+      this.rightHandleValue = event.value[1];
+      this.selectedData.push(this.leftHandleValue);
+      this.selectedData.push(this.rightHandleValue);
+      this.detectionRef();
+      this.updateTooltipValues();
+    }
   }
 
   onSliderCreated(): void {
-    // Your logic for handling slider creation
-    this.leftHandlePosition = this.calculatePosition(this.leftHandleValue);
-    this.rightHandlePosition = this.calculatePosition(this.rightHandleValue);
+    this.updateTooltipValues();
   }
 
   calculatePosition(value: number): number {
-    // Your logic to calculate the position based on the value
-    return (value / 500) * 100; // Example calculation
+    return (value / this.max) * 100; // Example calculation
+  }
+
+  updateTooltipValues(): void {
+    this.tooltip = {
+      ...this.tooltip,
+      content: `\$${this.leftHandleValue} - \$${this.rightHandleValue}`
+    };
+  }
+
+  detectionRef() {
+    // setTimeout(() => {
+    const currentValue = this.commonService.filterData.value;
+    const newValue = {
+      ...currentValue,
+      priceId: this.selectedData
+    };
+
+    this.commonService.filterData.next(newValue);
+
+    // Manually mark the component for changes
+    this.cdRef.markForCheck();
+    // }, 0);
   }
 }

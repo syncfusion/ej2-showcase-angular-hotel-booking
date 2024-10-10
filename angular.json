@@ -26,7 +26,6 @@
             ],
             "styles": [
               "src/styles.css",
-              "./node_modules/@syncfusion/ej2-material-theme/styles/material.css",
               "node_modules/@syncfusion/ej2-base/styles/tailwind.css",
               "node_modules/@syncfusion/ej2-schedule/styles/tailwind.css"
             ],
@@ -92,8 +91,7 @@
               "src/assets"
             ],
             "styles": [
-              "src/styles.css",
-              "./node_modules/@syncfusion/ej2-material-theme/styles/material.css"
+              "src/styles.css"
             ],
             "scripts": []
           }

@@ -1,7 +1,6 @@
-import { Component, ElementRef, HostListener, Inject, PLATFORM_ID, Renderer2, ViewChild, ViewEncapsulation } from '@angular/core';
+import { Component, ElementRef, HostListener, Inject, PLATFORM_ID, Renderer2, ViewChild, ViewEncapsulation, ChangeDetectionStrategy, ChangeDetectorRef } from '@angular/core';
 
-import { BrowserModule } from '@angular/platform-browser'
-import { addDays, EJ2Instance, EventRenderedArgs, PopupCloseEventArgs, PopupOpenEventArgs, RenderCellEventArgs, resetTime, ResourceDetails, ScheduleComponent, ScheduleModule, setTime } from '@syncfusion/ej2-angular-schedule'
+import { ActionEventArgs, addDays, EJ2Instance, PopupCloseEventArgs, resetTime, ScheduleComponent, ScheduleModule, } from '@syncfusion/ej2-angular-schedule'
 import { RadioButtonModule } from '@syncfusion/ej2-angular-buttons'
 import { Query } from '@syncfusion/ej2-data';
 import {
@@ -12,10 +11,10 @@ import {
 import { DatePickerAllModule, DateTimePickerModule, TimePickerModule } from '@syncfusion/ej2-angular-calendars';
 import { SvgIconComponent } from './svg-icon/svg-icon.component';
 import { CommonModule, isPlatformBrowser } from '@angular/common';
-import { Browser, createElement, Internationalization, isNullOrUndefined, L10n } from '@syncfusion/ej2-base';
-import { FormValidator, NumericTextBox, NumericTextBoxModule, TextBoxAllModule } from '@syncfusion/ej2-angular-inputs';
+import { Browser, Internationalization, isNullOrUndefined, L10n } from '@syncfusion/ej2-base';
+import { NumericTextBoxModule, TextBoxAllModule } from '@syncfusion/ej2-angular-inputs';
 import { DropDownListAllModule } from '@syncfusion/ej2-angular-dropdowns';
-import { FormBuilder, FormGroup, ReactiveFormsModule } from '@angular/forms';
+import { FormBuilder, ReactiveFormsModule, UntypedFormControl, UntypedFormGroup, Validators } from '@angular/forms';
 import { ToastAllModule, ToastComponent } from '@syncfusion/ej2-angular-notifications';
 import { CommonService } from '../common.service';
 @Component({
@@ -33,28 +32,17 @@ import { CommonService } from '../common.service';
     AgendaService,
     MonthAgendaService,
     TimelineViewsService, TimelineMonthService],
-  encapsulation: ViewEncapsulation.None
-  // encapsulation: ViewEncapsulation.None
-  // providers: [DayService, WeekService, WorkWeekService, MonthService, AgendaService, MonthAgendaService, TimelineViewsService, TimelineMonthService]
+  encapsulation: ViewEncapsulation.None,
+  changeDetection: ChangeDetectionStrategy.OnPush // Set OnPush strategy
 
 })
 export class SchedulerComponent {
-  roomPrice: number = 150;
-  noOfNights: number = 2;
-  adultCount: number = 2;
-  childCount: number = 1;
-  checkInTime: Date = new Date();
-  checkOutTime: Date = new Date();
   roomQuery!: Query;
-  bookingForm!: FormGroup;
+  bookingForm!: UntypedFormGroup;
   intl: Internationalization = new Internationalization();
-currentDate: Date = new Date();
-@ViewChild('eventTemplate', { static: true }) eventTemplate!: ElementRef;
-  public selectedDate: Date = new Date(
-    this.currentDate.getFullYear(),
-    this.currentDate.getMonth(),
-    this.currentDate.getDate()
-  );
+  currentDate!: Date
+  @ViewChild('eventTemplate', { static: true }) eventTemplate!: ElementRef;
+  public selectedDate!: Date
   public views: Array<string> = ['TimelineMonth'];
   public eventSettings: EventSettingsModel = {
     dataSource: this.commonService.bookingData,
@@ -65,70 +53,35 @@ currentDate: Date = new Date();
     },
   };
 
-
-  borderColor: any = {
-    '1_1': '#E879F9',
-    '2_1': '#4ADE80',
-    '3_1': '#6F47FF',
-    '4_1': '#22D3EE',
-    '5_2': '#F472B6',
-    '6_2': '#FDBA74',
-    '7_2': '#C084FC',
-    '8_2': '#22D3EE',
-    '9_3': '#E879F9',
-    '10_3': '#4ADE80',
-    '11_3': '#6F47FF',
-    '12_3': '#22D3EE',
-    '13_4': '#F472B6',
-    '14_4': '#FDBA74',
-    '15_4': '#C084FC',
-    '16_4': '#22D3EE',
-    '17_5': '#E879F9',
-    '18_5': '#4ADE80',
-    '19_5': '#6F47FF',
-    '20_5': '#22D3EE',
-  };
-  public allowMultipleOwner: Boolean = true;
-  public ownerDataSource: Object[] = [
-    { OwnerText: 'Nancy', Id: 1, OwnerColor: '#ffaa00' },
-    { OwnerText: 'Steven', Id: 2, OwnerColor: '#f8a398' },
-    { OwnerText: 'Michael', Id: 3, OwnerColor: '#7499e1' }
-  ];
+  borderColor!: any
   scheduleHeight: any
   proofData: Record<string, any>[] = [
     { text: 'Passport', Value: '0,', id: 1 },
     { text: 'Driving License', Value: '1', id: 2 }
   ];
   isDevice = Browser.isDevice ? "300px" : "580px";
+  isBrowser = Browser.isDevice;
   @ViewChild('scheduleObj') scheduleObj!: ScheduleComponent;
   @ViewChild('toastObj') toastObj!: ToastComponent;
 
   // current_date: Date = new Date();
-  floorData: any
-  roomData: any
+  floorData: any;
+  roomData: any;
+  selectedRoomData: any = [];
   toastPosition: Record<string, any> = { X: "Right", Y: "Bottom" };
   toastWidth = Browser.isDevice ? "300px" : "580px";
+  group = {
+    resources: ['Floors', 'Rooms'],
+    enableCompactView: false,
+  };
+
   constructor(@Inject(PLATFORM_ID) private platformId: any, private renderer: Renderer2, private fb: FormBuilder
-    , private commonService: CommonService) {
-    this.bookingForm = this.fb.group({
-      GuestName: [''],
-      CheckIn: [this.checkInTime],
-      Floor: [null],
-      Room: [null],
-      Price: [{ value: this.roomPrice, disabled: true }],
-      Nights: [this.noOfNights],
-      Adults: [this.adultCount],
-      Child: [this.childCount],
-      CheckOut: [this.checkOutTime],
-      Purpose: [''],
-      Proof: [null],
-      ProofNumber: [''],
-      Email: [''],
-      ContactNumber: ['']
-    });
+    , public commonService: CommonService, private cdr: ChangeDetectorRef) {
+
   }
 
   ngOnInit(): void {
+    this.borderColor = this.commonService.borderColor;
     this.floorData = this.commonService.floorData;
     this.roomData = this.commonService.roomData;
     L10n.load({
@@ -142,51 +95,94 @@ currentDate: Date = new Date();
     if (isPlatformBrowser(this.platformId)) {
       this.updateHeight();  // Only run this in the browser
     }
-    this.bookingForm = this.fb.group({
-      GuestName: [''],
-      CheckIn: [this.checkInTime],
-      Floor: [null],
-      Room: [null],
-      Price: [{ value: this.roomPrice, disabled: true }],
-      Nights: [this.noOfNights],
-      Adults: [this.adultCount],
-      Child: [this.childCount],
-      CheckOut: [this.checkOutTime],
-      Purpose: [''],
-      Proof: [null],
-      ProofNumber: [''],
-      Email: [''],
-      ContactNumber: ['']
+
+    this.bookingForm = new UntypedFormGroup({
+      Id: new UntypedFormControl(null),
+      GuestName: new UntypedFormControl(null, Validators.required),
+      CheckIn: new UntypedFormControl(this.currentDate, Validators.required),
+      Floor: new UntypedFormControl(1, Validators.required),
+      Room: new UntypedFormControl(null, Validators.required),
+      Price: new UntypedFormControl({ value: null, disabled: true }, Validators.required),
+      Nights: new UntypedFormControl({ value: 1, disabled: true }, Validators.required),
+      Adults: new UntypedFormControl(1, Validators.required),
+      Child: new UntypedFormControl(1, Validators.required),
+      CheckOut: new UntypedFormControl(this.currentDate, Validators.required),
+      Purpose: new UntypedFormControl('', Validators.required),
+      Proof: new UntypedFormControl(null, Validators.required),
+      ProofNumber: new UntypedFormControl('', Validators.required),
+      Email: new UntypedFormControl('', [Validators.required, Validators.email]),
+      ContactNumber: new UntypedFormControl('', [Validators.required, Validators.maxLength(10)]),
+      Color: new UntypedFormControl(null)
     });
+    this.filteredRoomData(1);
+
 
     this.commonService.emittedData.subscribe((res) => {
       if (res) {
         this.formData();
       }
     });
-
-    this.commonService.filterData.subscribe((res:any) => {
-      console.log(res);
-      if(res && res.floorId.length > 0) {
+    this.commonService.filterData.subscribe((res: any) => {
+      if (res && res.floorId.length > 0) {
         this.commonService.showSchedule = true;
-        this.floorData = this.commonService.floorData.filter((obj: any ) => res.floorId.includes(obj.id));
-        this.roomData = this.commonService.roomData.filter((item: any ) => res.floorId.includes(item.groupId));
-        if(res?.featuresId?.length > 0) {
-          this.roomData = this.roomData.filter((room:any) => 
-            res.featuresId.every((featureId:any) => 
-              room.amenities.some((amenity:any) => amenity?.id === featureId)
+        this.floorData = this.commonService.floorData.filter((obj: any) => res.floorId.includes(obj.id));
+        this.roomData = this.commonService.roomData.filter((item: any) => res.floorId.includes(item.groupId));
+        if (res?.featuresId?.length > 0) {
+          this.roomData = this.roomData.filter((room: any) =>
+            res.featuresId.every((featureId: any) =>
+              room.amenities.some((amenity: any) => amenity?.id === featureId)
             )
           );
         }
-      } else if(res && res.floorId.length === 0)  {
-        // this.floorData = this.commonService.floorData;
-        // this.roomData = this.commonService.roomData;
+        if (String(res?.search).trim()) {
+          this.roomData = this.roomData.filter((item: any) => item.text.toLowerCase().includes(String(res?.search).toLowerCase()));
+        }
+        if (res?.priceId?.length > 0) {
+          this.roomData = this.roomData.filter((item: any) =>
+            item.price >= res.priceId[0] && item.price <= res.priceId[1]
+          );
+        }
+      } else if (res && res.floorId.length === 0) {
         this.commonService.showSchedule = false;
       }
+      if (this.roomData.length === 0) {
+        this.commonService.showSchedule = false;
+      }
+      this.bookingForm.reset();
+      this.bookingForm.patchValue({ Floor: 1 })
+      this.filteredRoomData(1);
+    });
+
+    this.commonService.currentDate.subscribe((res) => {
+      this.currentDate = res;
+      this.selectedDate = new Date(
+        this.currentDate.getFullYear(),
+        this.currentDate.getMonth(),
+        this.currentDate.getDate()
+      );
+      if (this.scheduleObj)
+        this.scheduleObj.refresh();
     })
+
+  }
+
+  ngAfterViewInit() {
+    this.cdr.detectChanges();
+  }
+
+  filteredRoomData(floorId: number, roomId?: any) {
+    this.selectedRoomData = this.commonService.roomData.filter((res: any) => res.groupId === floorId);
+    this.bookingForm.patchValue({
+      Room: roomId ? roomId : this.selectedRoomData[0].id,
+      Price: roomId ? this.selectedRoomData.find((res: any) => res.id == roomId)['price']
+        : this.selectedRoomData[0].price
+    });
+    this.bookingForm.get('Price')?.disable();
+
   }
 
   formData() {
+    this.bookingForm.reset();
     if (this.scheduleObj) {
       const selectedCells = this.scheduleObj.getSelectedCells() as Element[];
       const cellDetails = this.scheduleObj.getCellDetails(selectedCells);
@@ -196,11 +192,23 @@ currentDate: Date = new Date();
         CheckIn: cellDetails?.startTime ?? resetTime(new Date()),
         CheckOut: cellDetails?.endTime ?? addDays(resetTime(new Date()), 1),
         IsAllDay: cellDetails?.isAllDay ?? false,
-        ...(details.groupData as any),
-        Price: details.resourceData['price'],
+        ...(details?.groupData as any),
+        Price: details?.resourceData['price'],
       };
-
       this.scheduleObj.openEditor(cellData, 'Add', true);
+      this.bookingForm.markAsPristine();
+      const nextData = new Date();
+      nextData.setDate(new Date().getDate() + 1)
+      this.bookingForm.patchValue({
+        Nights: 1,
+        CheckIn: new Date(),
+        CheckOut: nextData,
+        Floor: 1,
+        Adults: 1,
+        Child: 1
+      })
+      this.bookingForm.get('Nights')?.disable();
+      this.filteredRoomData(1);
     } else {
       console.error('ScheduleComponent is not initialized.');
     }
@@ -218,43 +226,39 @@ currentDate: Date = new Date();
       this.updateHeight();
     }
   }
-  // toast_position = { X: 'Right', Y: 'Bottom' };
-  // toast_width = '580px';
-  group = {
-    resources: ['Floors', 'Rooms'],
-    enableCompactView: false,
-  };
 
 
-  onRenderCell(args: RenderCellEventArgs): void {
+
+  onRenderCell(args: any): void {
 
     if (args.elementType == 'monthCells') {
       let weekEnds: number[] = [0, 6];
-      // if (args.date && weekEnds.indexOf((args.date).getDay()) >= 0) {
-        //   let ele: HTMLElement = createElement('div', {
-        //     innerHTML: `<div className="template-wrap"><span className="price-tag">{`$${getPrice(data.groupIndex)}`}</span></div>`,
-        //     className: 'templatewrap'
-        //   });
-        //   (args.element).appendChild(ele);
-        const wrapperDiv = this.renderer.createElement('div');
-        this.renderer.addClass(wrapperDiv, 'template-wrap');
+      const wrapperDiv = this.renderer.createElement('div');
+      this.renderer.addClass(wrapperDiv, 'template-wrap');
 
-        // Create the price span
-        const priceSpan = this.renderer.createElement('span');
-        this.renderer.addClass(priceSpan, 'price-tag');
+      // Create the price span
+      const priceSpan = this.renderer.createElement('span');
+      this.renderer.addClass(priceSpan, 'price-tag');
 
-        // Set innerHTML using Renderer2
-        const price = this.getPrice(args.groupIndex?.valueOf());
-        const text = this.renderer.createText(`$${price}`);
-        this.renderer.appendChild(priceSpan, text);
+      // Set innerHTML using Renderer2
+      const price = this.getPrice(args.groupIndex?.valueOf());
+      const text = this.renderer.createText(`$${price}`);
+      this.renderer.appendChild(priceSpan, text);
 
-        // Append the priceSpan to the wrapperDiv
-        this.renderer.appendChild(wrapperDiv, priceSpan);
+      // Append the priceSpan to the wrapperDiv
+      this.renderer.appendChild(wrapperDiv, priceSpan);
 
-        // Finally, append the wrapperDiv to the component's root element (or wherever appropriate)
-        // this.renderer.appendChild(this.el.nativeElement, wrapperDiv);
-        (args.element).appendChild(wrapperDiv);
+      // Finally, append the wrapperDiv to the component's root element (or wherever appropriate)
+      // this.renderer.appendChild(this.el.nativeElement, wrapperDiv);
+      (args.element).appendChild(wrapperDiv);
       // }
+      const today = new Date();
+      today.setDate(today.getDate() - 1);
+      if (args.elementType === "monthCells") {
+        if (args?.date < today) {
+          args.element.classList.add('past-cell');
+        }
+      }
     }
   }
 
@@ -291,39 +295,47 @@ currentDate: Date = new Date();
     return roomIndex;
   };
 
-  editorTemplate(data: any) {
-    const noOfNights: number = this.calculateNights(data.CheckIn, data.CheckOut);
-    const roomIndex: number = this.getRoomIndex(data.Room, 'Rooms');
-    const priceData: ResourceDetails = this.scheduleObj?.getResourcesByIndex(
-      roomIndex,
-    ) as ResourceDetails;
-    const roomPrice: any = priceData?.resourceData['price'];
-    const checkInTime = setTime(new Date(data.CheckIn), 12 * 60 * 60 * 1000);
-    const checkOutTime = setTime(new Date(data.CheckOut), 12 * 60 * 60 * 1000);
-    const childCount: any = data.Child;
-    const adultCount: number = data.Adults;
 
-  };
 
-  timeChanged(event: any) {
-    // Handle time change
+  timeChanged(event: any, fromCheckIn?: boolean) {
+    if (event?.value) {
+      if (fromCheckIn) {
+        this.bookingForm.patchValue({ CheckIn: new Date(event.value) });
+        const nextDate = new Date(event.value);
+        nextDate.setDate(new Date(event.value).getDate() + 1);
+        this.bookingForm.patchValue({ CheckOut: new Date(nextDate) });
+
+      } else {
+        this.bookingForm.patchValue({ CheckOut: new Date(event.value) });
+      }
+      this.onRoomsChange({ value: this.bookingForm.get('Room')?.value });
+    }
   }
 
-  disabledDate(args: any) {
-    // Handle disabled dates
-  }
+
 
   onFloorsChange(event: any) {
-    // Handle floor change logic
+    if (event?.value) {
+      this.selectedRoomData = this.roomData.filter((res: any) => res.groupId === event.value);
+      this.bookingForm.patchValue({ Floor: event.value });
+      this.filteredRoomData(event.value);
+    }
   }
 
   onRoomsChange(event: any) {
-    // Handle room change logic
+    if (event?.value) {
+      const selectedRoomIndex = this.selectedRoomData.findIndex((res: any) => res.id === event.value);
+      if (selectedRoomIndex >= 0) {
+        this.bookingForm.patchValue({ Price: this.selectedRoomData[selectedRoomIndex].price })
+        this.bookingForm.get('Price')?.disable();
+      }
+    }
+    if (this.bookingForm.get('CheckIn')?.value && this.bookingForm.get('CheckOut')?.value) {
+      let nightCount = this.calculateNights(this.bookingForm.get('CheckIn')?.value, this.bookingForm.get('CheckOut')?.value)
+      this.bookingForm.patchValue({ Price: nightCount * this.bookingForm.get('Price')?.value, Nights: nightCount })
+    }
   }
 
-  checkOutValidation(args: any) {
-    // Handle check-out validation
-  }
 
   onEventCheck(args: any) {
     let eventObj: any = args.data instanceof Array ? args.data[0] : args.data;
@@ -334,55 +346,96 @@ currentDate: Date = new Date();
 
 
 
-  // onPopupOpen(args: PopupOpenEventArgs) {
-  //   if (
-  //     (args.target && !args.target.classList.contains('e-appointment') && args.type === 'QuickInfo') ||
-  //     args.type === 'Editor'
-  //   ) {
-  //     args.cancel = this.onEventCheck(args);
-  //     if (args.cancel) {
-  //       return;
-  //     }
-  //   }
+  onActionBegin(event: ActionEventArgs) {
+    if (this.bookingForm.valid) {
+      this.bookingForm.get('Nights')?.enable();
+      this.bookingForm.get('Price')?.enable();
+      this.bookingForm.patchValue({ Color: this.getBorderColor(this.bookingForm.get('Room')?.value, this.bookingForm.get('Floor')?.value) });
+      this.bookingForm.patchValue({
+        CheckIn: this.bookingForm.get('CheckIn')?.value.toISOString(),
+        CheckOut: this.bookingForm.get('CheckOut')?.value.toISOString()
+      })
 
-  //   const popupType: string[] = ['Editor', 'RecurrenceAlert', 'DeleteAlert'];
+      let slotAvail: boolean = false;
+      if (
+        ['eventCreate', 'eventChange', 'eventRemove'].includes(event.requestType)
+      ) {
+        event.cancel = true;
+        switch (event.requestType) {
+          case 'eventCreate':
+            event.addedRecords?.forEach((data: Record<string, any>) => {
+              if (this.scheduleObj.isSlotAvailable(this.bookingForm.value)) {
+                slotAvail = true;
+                this.bookingForm.get('Id')?.setValue(data['Id'])
+                this.commonService.bookingData.push(this.bookingForm.value);
+                this.bookingForm.get('Nights')?.disable();
+                this.bookingForm.get('Price')?.disable();
+                this.toastObj.content = "Booking has been created successfully.";
+                this.toastObj.cssClass = "e-toast-success";
+                this.toastObj.show();
+              }
+            });
+            break;
+          case 'eventChange':
+            event.changedRecords?.forEach((data: Record<string, any>) => {
+              if (this.scheduleObj.isSlotAvailable(this.bookingForm.value)) {
+                slotAvail = true;
+                this.commonService.bookingData = this.commonService.bookingData.filter((obj: any) => obj.Id !== this.bookingForm.get('Id')?.value);
+                this.commonService.bookingData.push(this.bookingForm.value)
+                this.eventSettings.dataSource = this.commonService.bookingData;
+                this.scheduleObj?.saveEvent(this.bookingForm.value);
+                this.scheduleObj.refresh();
+                this.bookingForm.get('Nights')?.disable();
+                this.bookingForm.get('Price')?.disable();
+                this.toastObj.content = "Booking has been updated successfully.";
+                this.toastObj.cssClass = "e-toast-success";
+                this.toastObj.show();
+              }
+            });
+            break;
+          case 'eventRemove':
+            event.deletedRecords?.forEach((data: Record<string, any>) => {
+              slotAvail = true;
+              let index = this.commonService.bookingData.findIndex((res: any) => res.Id === this.bookingForm.get('Id')?.value);
+              if (index >= 0) {
+                this.commonService.bookingData.splice(index, 1);
+              }
+              this.eventSettings.dataSource = this.commonService.bookingData;
+              this.scheduleObj?.deleteEvent(this.bookingForm.get('Id')?.value);
+              this.toastObj.content = "Booking has been deleted successfully.";
+              this.toastObj.cssClass = "e-toast-success";
+              this.toastObj.show();
+            });
+            break;
+        }
+        if (!slotAvail) {
+          this.toastObj.content = "Room not available for booking on the selected Dates.";
+          this.toastObj.cssClass = "e-toast-warning";
+          this.toastObj.show();
+        }
+      }
+      if (this.scheduleObj) {
+        this.scheduleObj.refresh();
+        this.bookingForm.reset();
+        this.commonService.emittedSavedData.next(true);
+      }
+    }
+  }
 
-  //   if (popupType.includes(args.type)) {
-  //     const target = ['DeleteAlert', 'RecurrenceAlert'].includes(args.type) ? args.element : args.target;
-
-  //     if (target?.classList.contains('e-work-cells')) {
-  //       args.cancel = target.classList.contains('e-read-only-cells') ||
-  //         !this.scheduleObj.isSlotAvailable(args.data as Record<string, any>);
-  //     }
-
-  //     const errorTarget: HTMLElement = document.getElementById('EventType_Error') as HTMLElement;
-
-  //     if (!isNullOrUndefined(errorTarget)) {
-  //       errorTarget.style.display = 'none';
-  //       errorTarget.style.left = '351px';
-  //     }
-
-  //     setTimeout(() => {
-  //       const formElement: HTMLElement = args.element.querySelector('.e-schedule-form') as HTMLElement;
-
-  //       if (formElement == null) {
-  //         return;
-  //       }
-
-  //       const validator: FormValidator = (formElement as any).ej2_instances[0] as FormValidator;
-  //       validator.addRules('guestName', { required: true });
-  //       validator.addRules('child', { required: true });
-  //       validator.addRules('adults', { required: true });
-  //       validator.addRules('purpose', { required: true });
-  //       validator.addRules('proofNumber', { required: true });
-  //       validator.addRules('email', { required: true });
-  //       validator.addRules('guestProof', { required: true });
-  //       validator.addRules('contactNumber', { required: true, minLength: [10, 'Please enter a valid phone number.'] });
-  //     }, 100);
-  //     this.scheduleObj.openEditor(args.data as Record<string, any>, 'Add', true);
-  //   }
-  // }
   onPopupClose(args: PopupCloseEventArgs) {
+    if (args?.event?.target["innerText"] === "" && args?.data && this.bookingForm.invalid) {
+      this.bookingForm.markAllAsTouched();
+      args.cancel = true;
+      args.data = null;
+    }
+    if (args?.event?.target["innerText"] === "" || args?.event?.target["innerText"] === 'Cancel') {
+      args.cancel = false;
+    }
+    if (args?.event?.target["innerText"] === "Save" && this.bookingForm.invalid) {
+      this.bookingForm.markAllAsTouched();
+      args.cancel = true;
+    }
+
     if (args.type === 'Editor' && args.data) {
       const formElement: any = args.element.querySelectorAll(
         '.custom-event-editor .e-lib[data-name]',
@@ -396,9 +449,6 @@ currentDate: Date = new Date();
           eventObj[fieldName] = instance.value;
         }
       }
-      args.data = eventObj;
-      console.log(args.data);
-      this.commonService.bookingData.push(this.bookingForm.value);
     }
   }
 
@@ -421,10 +471,10 @@ currentDate: Date = new Date();
   applyCategoryColor(args: any) {
     const roomId: number = args.data.Room;
     const floorId: number = args.data.Floor;
-    const borderColor = this.getBorderColor(roomId, floorId);
+    const color = this.getBorderColor(roomId, floorId);
     args.element.style.setProperty(
       'border',
-      `1px solid ${borderColor}`,
+      `1px solid ${color}`,
       'important',
     );
   };
@@ -435,8 +485,81 @@ currentDate: Date = new Date();
   };
 
 
-  onPopupOpen(args: PopupOpenEventArgs) {
+  checkoutValidation(event: any) {
+    const checkIn: Date = this.bookingForm.get('CheckIn')?.value;
+    if (checkIn) {
+      if (event.date < checkIn) {
+        event.isDisabled = true;
+      }
+    }
   }
 
+  disabledDate(event: any) {
+    const today = new Date();
+    today.setDate(today.getDate() - 1);
+    if (event.date < today) {
+      event.isDisabled = true;
+    }
+  }
 
+  onPopupOpen(args: any) {
+    this.bookingForm.markAsPristine();
+    if ((args.target && !args.target.classList.contains('e-appointment') && (args.type === 'QuickInfo')) || (args.type === 'Editor')) {
+      args.cancel = this.onEventCheck(args);
+      if (args.cancel) {
+        return;
+      }
+    }
+    const popupType: string[] = ['Editor', 'RecurrenceAlert', 'DeleteAlert'];
+    if (popupType.includes(args.type)) {
+      const target = ['DeleteAlert', 'RecurrenceAlert'].includes(args.type)
+        ? args.element
+        : args.target;
+      if (target?.classList.contains('e-work-cells')) {
+        args.cancel =
+          target.classList.contains('e-read-only-cells') ||
+          !this.scheduleObj?.isSlotAvailable(
+            args.data as Record<string, any>,
+          );
+      }
+      const errorTarget: HTMLElement = document.getElementById(
+        'EventType_Error',
+      ) as HTMLElement;
+      if (!isNullOrUndefined(errorTarget)) {
+        errorTarget.style.display = 'none';
+        errorTarget.style.left = '351px';
+      }
+    }
+    if (args?.data) {
+      this.bookingForm.patchValue({
+        CheckIn: new Date(args?.data?.CheckIn),
+        CheckOut: new Date(args?.data?.CheckOut),
+        Floor: args?.data?.Floor,
+        Child: args?.data?.Child ? args?.data?.Child : 1,
+        Adults: args?.data?.Adults ? args?.data?.Adults : 1,
+        Nights: args?.data?.Nights ? args?.data?.Nights : 1,
+        Color: args?.data?.Color ? args?.data?.Color : null,
+        Email: args?.data?.Email ? args?.data?.Email : null,
+        ContactNumber: args?.data?.ContactNumber ? args?.data?.ContactNumber : null,
+        GuestName: args?.data?.GuestName ? args?.data?.GuestName : null,
+        Proof: args?.data?.Proof ? args?.data?.Proof : null,
+        ProofNumber: args?.data?.ProofNumber ? args?.data?.ProofNumber : null,
+        Purpose: args?.data?.Purpose ? args?.data?.Purpose : null,
+        Id: args?.data?.Id ? args?.data?.Id : null,
+        Room: args?.data?.Room,
+        Price: args?.data?.Price ? args?.data?.Price : null
+      });
+      if (args?.data?.Guid) {
+        this.bookingForm.addControl('Guid', new UntypedFormControl(args?.data?.Guid))
+      }
+      if (args?.data?.Id) {
+        this.selectedRoomData = this.commonService.roomData.filter((res: any) => res.groupId === args?.data?.Floor);
+
+      } else {
+        this.filteredRoomData(args?.data?.Floor, args?.data?.Room);
+
+      }
+    }
+  }
 }
+

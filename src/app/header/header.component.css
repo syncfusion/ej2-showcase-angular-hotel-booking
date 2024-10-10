@@ -2,14 +2,14 @@
 @import "@syncfusion/ej2-buttons/styles/tailwind.css";
 @import "@syncfusion/ej2-inputs/styles/tailwind.css";
 
-.search-container .app-search .e-lib.e-input {
+.app-search {
   height: 32px;
 }
 
 .header-container {
   align-items: center;
   display: flex;
-  height: 54px;
+  height: 9px;
   justify-content: space-between;
   padding: 24px;
 }
@@ -121,3 +121,6 @@
   }
 }
 
+.search-container .app-search .e-lib.e-input {
+  height: 32px;
+}

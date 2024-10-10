@@ -6,29 +6,30 @@ import { BehaviorSubject } from 'rxjs';
 })
 export class CommonService {
 
-  bookingData: Array<Record<string, any>> = [{
-    Id: 1,
-    GuestName: `Steve Smith`,
-    CheckIn:'2024-09-29T12:56:55.769Z',
-    CheckOut: '2024-09-30T12:56:55.769Z',
-    IsAllDay: false,
-    Floor: 1,
-    Room: 1,
-    Nights: 1,
-    Adults: 2,
-    Child: 1,
-    Purpose: 'Vacation',
-    ContactNumber: '',
-    Email: '',
-    Price: 500,
-    Proof: '',
-    ProofNumber: '',
-    EndTimezone: null,
-    RecurrenceException: null,
-    RecurrenceID: null,
-    RecurrenceRule: null,
-    StartTimezone: null,
-  }]
+  borderColor: any = {
+    '1_1': '#E879F9',
+    '2_1': '#4ADE80',
+    '3_1': '#6F47FF',
+    '4_1': '#22D3EE',
+    '5_2': '#F472B6',
+    '6_2': '#FDBA74',
+    '7_2': '#C084FC',
+    '8_2': '#22D3EE',
+    '9_3': '#E879F9',
+    '10_3': '#4ADE80',
+    '11_3': '#6F47FF',
+    '12_3': '#22D3EE',
+    '13_4': '#F472B6',
+    '14_4': '#FDBA74',
+    '15_4': '#C084FC',
+    '16_4': '#22D3EE',
+    '17_5': '#E879F9',
+    '18_5': '#4ADE80',
+    '19_5': '#6F47FF',
+    '20_5': '#22D3EE',
+  };
+
+  bookingData: Array<Record<string, any>> = []
   floorData: Array<Record<string, any>> = [
     { text: 'Ground Floor', id: 1, color: '#cb6bb2' },
     { text: 'First Floor', id: 2, color: '#56ca85' },
@@ -43,7 +44,7 @@ export class CommonService {
     { id: 4, name: 'Whiteboard' },
     { id: 5, name: 'Kitchen' },
     { id: 6, name: 'Internet' },
-    ];
+  ];
 
 
   roomData: Array<Record<string, any>> = [
@@ -296,12 +297,17 @@ export class CommonService {
 
 
   emittedData = new BehaviorSubject<boolean>(false);
-  filterData = new BehaviorSubject<{floorId:[],priceId:[],featuresId:[]}>({
-    floorId: [],
+  filterData = new BehaviorSubject<{ floorId: number[], priceId: number[], featuresId: number[], search: string }>({
+    floorId: [1, 2],
     priceId: [],
     featuresId: [],
+    search: ''
   });
   showSchedule: boolean = true;
+  currentDate = new BehaviorSubject<Date>(new Date());
+  emittedSavedData = new BehaviorSubject<boolean>(true);
+  openSideBar = new BehaviorSubject<boolean>(null);
+
 
   constructor() { }
 }

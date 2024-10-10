@@ -38,8 +38,10 @@
   color: #f97316;
 }
 
-.e-calendar.app-calendar .e-content.e-month .e-cell.almost-full span {
-  color: inherit;
+.e-calendar.app-calendar .e-content.e-month .e-cell.almost-full {
+  span {
+    color: inherit;
+  }
 }
 
 .e-calendar.app-calendar .e-content.e-month .e-cell.almost-full.e-selected,
@@ -50,4 +52,8 @@
 .e-calendar.app-calendar.e-device {
   max-width: 100% !important;
   min-width: 100% !important;
+}
+
+::ng-deep .e-calendar .e-content span.e-day {
+  color: inherit !important;
 }

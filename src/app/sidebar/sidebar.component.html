@@ -1,13 +1,24 @@
-<ejs-sidebar id="default-sidebar" #sidebar (created)="onCreated($event)" style="visibility: hidden" class="app-sidebar">
-    
+<ejs-sidebar id="default-sidebar" #sidebar (created)="onCreated($event)"
+    [style.visibility]="sidebarVisibility ? 'visible' : 'hidden'" class="app-sidebar" [mediaQuery]="mediaQuery"
+    [enableGestures]="enableGestures" [isOpen]="openedWidth">
+    <div class="sidebar-header" *ngIf="!openedWidth">
+        <div class="sidebar-title">Filter By</div>
+        <button ejs-button cssClass="sidebar-close e-flat e-small e-round" iconCss="e-icons e-close"
+            (click)="onSidebarClose()"></button>
+    </div>
     <div class="calendar-container">
         <app-calendar> </app-calendar>
     </div>
-    <div class="sidebar-header">
+    <!-- <div class="sidebar-header">
         <div class="sidebar-title">Filter By</div>
-       <app-filters> </app-filters> 
+        <app-filters> </app-filters>
+    </div> -->
+    <div class="filter-container">
+        <div class="filter-label">FILTER BY</div>
+        <app-filters></app-filters>
     </div>
-    
-    
+
 
 </ejs-sidebar>
+
+<div class="app-sidebar-overlay" #sidebarOverlay id="sidebarOverlay" [class.show]="sidebarVisibility"></div>

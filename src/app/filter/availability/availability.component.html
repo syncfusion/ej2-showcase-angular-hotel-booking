@@ -1,0 +1,5 @@
+<div class="available-rooms" *ngIf="bookedStatus['status']">
+    <span [ngClass]="['room-availability', bookedStatus['status']]">
+        {{ bookedStatus['status'] }} {{ bookedStatus['count'] }}
+    </span>
+</div>

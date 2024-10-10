@@ -1,1 +1,3 @@
-<ejs-calendar></ejs-calendar>
+<ejs-calendar #calendarRef cssClass="app-calendar" (renderDayCell)="onCellRendered($event)"
+    (change)="onDateChange($event)" value="{{currentDate}}">
+</ejs-calendar>

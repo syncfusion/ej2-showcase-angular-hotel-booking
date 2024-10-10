@@ -1,170 +1,231 @@
-<!-- <div>
+<ng-container *ngIf="!commonService?.showSchedule">
+  <div class="no-schedule">
+    <strong style="font-size: 16px;">
+      No properties found
+    </strong>
+    <p style="font-size: 14px;">
+      There are no matching properties for your search criteria. Try
+      updating your search.
+    </p>
+  </div>
+</ng-container>
+<div [ngClass]="{ 'hidden': !commonService?.showSchedule }">
+  <ejs-schedule #scheduleObj cssClass="app-scheduler" [width]="'100%'" [height]="scheduleHeight"
+    [selectedDate]="selectedDate" [views]="views" [eventSettings]="eventSettings" [workDays]="[0, 1, 2, 3, 4, 5, 6]"
+    [group]="group" (renderCell)="onRenderCell($event)" [timeScale]="{ enable: false }" [rowAutoHeight]="true"
+    [allowDragAndDrop]="false" [showHeaderBar]="false" [showQuickInfo]="isBrowser" (actionBegin)="onActionBegin($event)"
+    (popupClose)="onPopupClose($event)" (eventRendered)="onEventRendered($event)" (popupOpen)='onPopupOpen($event)'>
+    <ng-template #editorTemplate let-data>
+      <!-- <form [formGroup]="bookingForm" *ngIf="bookingForm"> -->
+      <div>
+        <div class="custom-event-editor" [formGroup]="bookingForm">
 
-  <ejs-schedule #scheduleObj [cssClass]="'app-scheduler'" [width]="'100%'" [height]="scheduleHeight"
-    [selectedDate]="current_date" [workDays]="[0, 1, 2, 3, 4, 5, 6]" [eventSettings]="event_settings" [group]="group"
-    [dateHeaderTemplate]="date_header_template" [cellTemplate]="cell_template" [timeScale]="{ enable: false }"
-    [rowAutoHeight]="true" [editorTemplate]="editor_template" (eventRendered)="on_event_rendered($event)"
-    (actionBegin)="on_action_begin($event)" (popupOpen)="on_popup_open($event)" (popupClose)="on_popup_close($event)"
-    [showQuickInfo]="isDevice ? true : false" [allowDragAndDrop]="false" [showHeaderBar]="false"
-    (renderCell)="on_cell_rendered($event)">
+          <!-- Guest Name -->
+          <div class="flex-prop">
+            <ejs-textbox id="guestName" placeholder="Guest Name *" floatLabelType="Always" cssClass="e-outline"
+              formControlName="GuestName">
+              <label for="check" class="e-float-text">User Name</label>
+            </ejs-textbox>
+            <div *ngIf="bookingForm.get('GuestName')?.invalid && bookingForm.get('GuestName')?.touched">
+              <div *ngIf="bookingForm.get('GuestName')?.errors?.['required']" class="e-error">
+                This field is required.
+              </div>
+            </div>
+          </div>
+
+          <!-- Check-In Date -->
+          <div class="flex-prop">
+            <ejs-datetimepicker id="checkIn" placeholder="Check In *" floatLabelType="Auto" cssClass="e-outline"
+              format="dd/MM/yy hh:mm a" formControlName="CheckIn" (change)="timeChanged($event, true)"
+              [showClearButton]="false" (renderDayCell)="disabledDate($event)">
+            </ejs-datetimepicker>
+            <div *ngIf="bookingForm.get('CheckIn')?.invalid && bookingForm.get('CheckIn')?.touched">
+              <div *ngIf="bookingForm.get('CheckIn')?.errors?.['required']" class="e-error">
+                This field is required.
+              </div>
+            </div>
+          </div>
+
+          <!-- Floor Number -->
+          <div class="flex-prop">
+            <ejs-dropdownlist id="floorNumber" placeholder="Select Floor *" floatLabelType="Always" cssClass="e-outline"
+              [dataSource]="floorData" formControlName="Floor" [fields]="{ text: 'text', value: 'id' }"
+              (change)="onFloorsChange($event)">
+            </ejs-dropdownlist>
+            <div *ngIf="bookingForm.get('Floor')?.invalid && bookingForm.get('Floor')?.touched">
+              <div *ngIf="bookingForm.get('Floor')?.errors?.['required']" class="e-error">
+                This field is required.
+              </div>
+            </div>
+          </div>
+
+          <!-- Room Number -->
+          <div class="flex-prop">
+            <ejs-dropdownlist id="roomNumber" placeholder="Select Property *" floatLabelType="Always"
+              cssClass="e-outline" [dataSource]="selectedRoomData" formControlName="Room"
+              [fields]="{ text: 'text', value: 'id' }" [query]="roomQuery" (change)="onRoomsChange($event)">
+            </ejs-dropdownlist>
+            <div *ngIf="bookingForm.get('Room')?.invalid && bookingForm.get('Room')?.touched">
+              <div *ngIf="bookingForm.get('Room')?.errors?.['required']" class="e-error">
+                This field is required.
+              </div>
+            </div>
+          </div>
+
+          <!-- Room Price -->
+          <div class="flex-prop">
+            <ejs-textbox id="roomPrice" placeholder="Price per night (USD) *" floatLabelType="Auto" cssClass="e-outline"
+              formControlName="Price" [disabled]="true">
+            </ejs-textbox>
+          </div>
+
+          <!-- Number of Nights -->
+          <div class="flex-prop">
+            <ejs-numerictextbox id="nights" placeholder="Nights *" floatLabelType="Auto" cssClass="e-outline" min="1"
+              max="9" formControlName="Nights" [disabled]="true">
+            </ejs-numerictextbox>
+          </div>
+
+          <!-- Adults -->
+          <div class="flex-prop">
+            <ejs-numerictextbox id="adults" placeholder="Adults *" floatLabelType="Auto" cssClass="e-outline" min="1"
+              max="30" formControlName="Adults">
+            </ejs-numerictextbox>
+            <div *ngIf="bookingForm.get('Adults')?.invalid && bookingForm.get('Room')?.touched">
+              <div *ngIf="bookingForm.get('Adults')?.errors?.['required']" class="e-error">
+                This field is required.
+              </div>
+            </div>
+          </div>
+
+          <!-- Children -->
+          <div class="flex-prop">
+            <ejs-numerictextbox id="child" placeholder="Children *" floatLabelType="Auto" cssClass="e-outline" min="1"
+              max="10" formControlName="Child">
+            </ejs-numerictextbox>
+            <div *ngIf="bookingForm.get('Child')?.invalid && bookingForm.get('Child')?.touched">
+              <div *ngIf="bookingForm.get('Child')?.errors?.['required']" class="e-error">
+                This field is required.
+              </div>
+            </div>
+          </div>
+
+          <!-- Check-Out Date -->
+          <div class="flex-prop">
+            <ejs-datetimepicker id="checkOut" placeholder="Check Out *" floatLabelType="Auto" cssClass="e-outline"
+              format="dd/MM/yy hh:mm a" formControlName="CheckOut" (change)="timeChanged($event)"
+              [showClearButton]="false" (renderDayCell)="checkoutValidation($event)">
+            </ejs-datetimepicker>
+            <div *ngIf="bookingForm.get('CheckOut')?.invalid && bookingForm.get('CheckOut')?.touched">
+              <div *ngIf="bookingForm.get('CheckOut')?.errors?.['required']" class="e-error">
+                This field is required.
+              </div>
+            </div>
+          </div>
+
+          <!-- Purpose -->
+          <div class="flex-prop">
+            <ejs-textbox id="purpose" placeholder="Purpose *" floatLabelType="Always" cssClass="e-outline"
+              formControlName="Purpose">
+            </ejs-textbox>
+            <div *ngIf="bookingForm.get('Purpose')?.invalid && bookingForm.get('Purpose')?.touched">
+              <div *ngIf="bookingForm.get('Purpose')?.errors?.['required']" class="e-error">
+                This field is required.
+              </div>
+            </div>
+          </div>
+
+          <!-- Proof of Guest -->
+          <div class="flex-prop">
+            <ejs-dropdownlist id="guestProof" placeholder="Proof of Guest *" [dataSource]="proofData"
+              floatLabelType="Always" formControlName="Proof" [fields]="{ text: 'text', value: 'id' }">
+            </ejs-dropdownlist>
+            <div *ngIf="bookingForm.get('Proof')?.invalid && bookingForm.get('Proof')?.touched">
+              <div *ngIf="bookingForm.get('Proof')?.errors?.['required']" class="e-error">
+                This field is required.
+              </div>
+            </div>
+          </div>
+
+          <!-- Proof Number -->
+          <div class="flex-prop">
+            <ejs-textbox id="proofNumber" placeholder="Proof Number *" floatLabelType="Always" cssClass="e-outline"
+              formControlName="ProofNumber">
+            </ejs-textbox>
+            <div *ngIf="bookingForm.get('ProofNumber')?.invalid && bookingForm.get('ProofNumber')?.touched">
+              <div *ngIf="bookingForm.get('ProofNumber')?.errors?.['required']" class="e-error">
+                This field is required.
+              </div>
+            </div>
+          </div>
+
+          <!-- Email -->
+          <div class="flex-prop">
+            <ejs-textbox id="email" placeholder="Email *" floatLabelType="Always" cssClass="e-outline" type="email"
+              formControlName="Email">
+            </ejs-textbox>
+            <div *ngIf="bookingForm.get('Email')?.invalid && bookingForm.get('Email')?.touched">
+              <div *ngIf="bookingForm.get('Email')?.errors?.['required']" class="e-error">
+                This field is required.
+              </div>
+              <div *ngIf="bookingForm.get('Email')?.errors?.['email']" class="e-error">
+                Enter valid email address
+              </div>
+            </div>
+          </div>
+
+          <!-- Contact Number -->
+          <div class="flex-prop">
+            <ejs-textbox id="contactNumber" placeholder="Contact Number *" floatLabelType="Always" cssClass="e-outline"
+              type="number" formControlName="ContactNumber">
+            </ejs-textbox>
+            <div *ngIf="bookingForm.get('ContactNumber')?.invalid && bookingForm.get('ContactNumber')?.touched">
+              <div *ngIf="bookingForm.get('ContactNumber')?.errors?.['required']" class="e-error">
+                This field is required.
+              </div>
+              <div *ngIf="bookingForm.get('ContactNumber')?.errors?.['maxlength']" class="e-error">
+                Enter a valid phone number (maximum length is 10 characters).
+              </div>
+            </div>
+          </div>
+
+        </div>
+      </div>
+      <!-- </form> -->
+    </ng-template>
+    <!-- <ng-template #editorFooterTemplate>
+    <div id="right-button">
+      <button id="Save" class="e-control e-btn e-primary" (click)="onSaveData()" data-ripple="true">Save</button>
+      <button id="Cancel" class="e-control e-btn e-primary" data-ripple="true" (click)="closePopUp()">Cancel</button>
+    </div>
+  </ng-template> -->
+    <ng-template #dateHeaderTemplate let-data>
+      <div style="display: flex; justify-content: center;">
+        {{getDateHeaderDay(data.date)}}
+      </div>
+      <div style="display: flex; justify-content: center;">
+        {{getDateHeaderDate(data.date)}}
+      </div>
+    </ng-template>
     <e-resources>
-      <e-resource field="Floor" title="Floors" name="Floors" [dataSource]="floor_data" textField="text" idField="id"
+      <e-resource field="Floor" title="Floors" name="Floors" [dataSource]="floorData" textField="text" idField="id"
         colorField="color"></e-resource>
-      <e-resource field="Room" title="Rooms" name="Rooms" [dataSource]="room_data" textField="text" idField="id"
+      <e-resource field="Room" title="Rooms" name="Rooms" [dataSource]="roomData" textField="text" idField="id"
         groupIDField="groupId" colorField="color"></e-resource>
     </e-resources>
     <e-views>
-      <e-view option="TimelineMonth" [eventTemplate]="event_template"></e-view>
+      <e-view option="TimelineMonth">
+        <ng-template #eventTemplate let-data>
+          <div class="template-wrap">
+            <!-- <div class="subject">{{data.Subject}}</div> -->
+            <app-svg-icon [color]="data.Color" [subject]="data.GuestName" [child]="data.Child" [adult]="data.Adults"
+              [night]="data.Nights">
+            </app-svg-icon>
+          </div>
+        </ng-template>
+      </e-view>
     </e-views>
   </ejs-schedule>
 
-  <ejs-toast #toastObj [position]="toast_position" [width]="toast_width" height="70px"
-    showCloseButton="true"></ejs-toast>
-</div> -->
-
-
-<ejs-schedule #scheduleObj class="app-scheduler" [width]="'100%'" [height]="scheduleHeight"
-  [selectedDate]="selectedDate" [views]="views" [eventSettings]="eventSettings" [workDays]="[0, 1, 2, 3, 4, 5, 6]"
-  [group]="group" (renderCell)="onRenderCell($event)" [timeScale]="{ enable: false }" [rowAutoHeight]="true"
-  [allowDragAndDrop]="false" [showHeaderBar]="false"  [showQuickInfo]="isDevice ? true : false"
-  (popupClose)='onPopupClose($event)' (eventRendered)="onEventRendered($event)" (popupOpen)='onPopupOpen($event)'>
-  <ng-template #editorTemplate let-data>
-    <!-- <form [formGroup]="bookingForm" *ngIf="bookingForm"> -->
-    <div>
-      <div class="custom-event-editor" [formGroup]="bookingForm">
-
-        <!-- Guest Name -->
-        <div class="flex-prop">
-          <ejs-textbox id="guestName" placeholder="Guest Name *" floatLabelType="Auto" cssClass="e-outline"
-            formControlName="GuestName">
-          </ejs-textbox>
-        </div>
-
-        <!-- Check-In Date -->
-        <div class="flex-prop">
-          <ejs-datetimepicker id="checkIn" placeholder="Check In *" floatLabelType="Auto" cssClass="e-outline"
-            format="dd/MM/yy hh:mm a" formControlName="CheckIn" (change)="timeChanged($event)"
-            [showClearButton]="false">
-          </ejs-datetimepicker>
-        </div>
-
-        <!-- Floor Number -->
-        <div class="flex-prop">
-          <ejs-dropdownlist id="floorNumber" placeholder="Select Floor *" floatLabelType="Auto" cssClass="e-outline"
-            [dataSource]="floorData" formControlName="Floor" [fields]="{ text: 'text', value: 'id' }"
-            (change)="onFloorsChange($event)">
-          </ejs-dropdownlist>
-        </div>
-
-        <!-- Room Number -->
-        <div class="flex-prop">
-          <ejs-dropdownlist id="roomNumber" placeholder="Select Property *" floatLabelType="Auto" cssClass="e-outline"
-            [dataSource]="roomData" formControlName="Room" [fields]="{ text: 'text', value: 'id' }" [query]="roomQuery"
-            (change)="onRoomsChange($event)">
-          </ejs-dropdownlist>
-        </div>
-
-        <!-- Room Price -->
-        <div class="flex-prop">
-          <ejs-textbox id="roomPrice" placeholder="Price per night (USD) *" floatLabelType="Auto" cssClass="e-outline"
-            formControlName="Price" [disabled]="true">
-          </ejs-textbox>
-        </div>
-
-        <!-- Number of Nights -->
-        <div class="flex-prop">
-          <ejs-numerictextbox id="nights" placeholder="Nights *" floatLabelType="Auto" cssClass="e-outline" min="1"
-            max="9" formControlName="Nights" [disabled]="true">
-          </ejs-numerictextbox>
-        </div>
-
-        <!-- Adults -->
-        <div class="flex-prop">
-          <ejs-numerictextbox id="adults" placeholder="Adults *" floatLabelType="Auto" cssClass="e-outline" min="1"
-            max="30" formControlName="Adults">
-          </ejs-numerictextbox>
-        </div>
-
-        <!-- Children -->
-        <div class="flex-prop">
-          <ejs-numerictextbox id="child" placeholder="Children *" floatLabelType="Auto" cssClass="e-outline" min="0"
-            max="10" formControlName="Child">
-          </ejs-numerictextbox>
-        </div>
-
-        <!-- Check-Out Date -->
-        <div class="flex-prop">
-          <ejs-datetimepicker id="checkOut" placeholder="Check Out *" floatLabelType="Auto" cssClass="e-outline"
-            format="dd/MM/yy hh:mm a" formControlName="CheckOut" (change)="timeChanged($event)"
-            [showClearButton]="false">
-          </ejs-datetimepicker>
-        </div>
-
-        <!-- Purpose -->
-        <div class="flex-prop">
-          <ejs-textbox id="purpose" placeholder="Purpose" floatLabelType="Auto" cssClass="e-outline"
-            formControlName="Purpose">
-          </ejs-textbox>
-        </div>
-
-        <!-- Proof of Guest -->
-        <div class="flex-prop">
-          <ejs-dropdownlist id="guestProof" placeholder="Proof of Guest" [dataSource]="proofData"
-            formControlName="Proof" [fields]="{ text: 'text', value: 'id' }">
-          </ejs-dropdownlist>
-        </div>
-
-        <!-- Proof Number -->
-        <div class="flex-prop">
-          <ejs-textbox id="proofNumber" placeholder="Proof Number" floatLabelType="Auto" cssClass="e-outline"
-            formControlName="ProofNumber">
-          </ejs-textbox>
-        </div>
-
-        <!-- Email -->
-        <div class="flex-prop">
-          <ejs-textbox id="email" placeholder="Email" floatLabelType="Auto" cssClass="e-outline" type="email"
-            formControlName="Email">
-          </ejs-textbox>
-        </div>
-
-        <!-- Contact Number -->
-        <div class="flex-prop">
-          <ejs-textbox id="contactNumber" placeholder="Contact Number" floatLabelType="Auto" cssClass="e-outline"
-            type="number" formControlName="ContactNumber">
-          </ejs-textbox>
-        </div>
-
-      </div>
-    </div>
-    <!-- </form> -->
-  </ng-template>
-  <ng-template #dateHeaderTemplate let-data>
-    <div style="display: flex; justify-content: center;">
-      {{getDateHeaderDay(data.date)}}
-    </div>
-    <div style="display: flex; justify-content: center;">
-      {{getDateHeaderDate(data.date)}}
-    </div>
-  </ng-template>
-  <e-resources>
-    <e-resource field="Floor" title="Floors" name="Floors" [dataSource]="floorData" textField="text" idField="id"
-      colorField="color"></e-resource>
-    <e-resource field="Room" title="Rooms" name="Rooms" [dataSource]="roomData" textField="text" idField="id"
-      groupIDField="groupId" colorField="color"></e-resource>
-  </e-resources>
-  <e-views>
-    <e-view option="TimelineMonth">
-      <ng-template #eventTemplate let-data>
-        <div class="template-wrap">
-          <!-- <div class="subject">{{data.Subject}}</div> -->
-          <app-svg-icon [color]="'#E879F9'" [subject]="data.GuestName" [child]="data.Child" [adult]="data.Adults"
-            [night]="data.Nights">
-          </app-svg-icon>
-        </div>
-      </ng-template>
-    </e-view>
-  </e-views>
-</ejs-schedule>
-
-<ejs-toast #toastObj [position]="toastPosition" [width]="toastWidth" height="70px" showCloseButton="true"></ejs-toast>
+  <ejs-toast #toastObj [position]="toastPosition" [width]="toastWidth" height="70px" showCloseButton="true"></ejs-toast>
+</div>
